@@ -2,7 +2,7 @@ import os
 import json
 from typing import Optional
 
-dict_prueba = {}
+dict_prueba = {1 : 2}
 RUTA = 'data/db.json'
 s = 'a'
 
@@ -23,11 +23,12 @@ def rewrite_json(file_path : str, data : dict, path: Optional[list[str]] = None)
     if not path:
         actual_data.update(data)
     else:
-        actual = actual_data
+        current = actual_data
         for key in path[:-1]:
-            actual_data = actual.setdefault( key, {})
-        if path:
-            actual_data.setdefault(path[:-1], {}).update(data)
+            current = current.setdefault(key, {})
+        current[path[-1]] = data
+    
+    write_json(file_path, actual_data)
 
 def delete_data_json(file_path : str,  path: list[str]) -> bool: # type: ignore
     data1 = read_json(file_path)
