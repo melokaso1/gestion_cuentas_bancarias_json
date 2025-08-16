@@ -88,7 +88,7 @@ if __name__ == '__main__':
                 case 9:
                     os.system('cls')
                     break
-        except ValueError:
+        except (ValueError, KeyboardInterrupt):
             print("Por favor ingrese un número válido.")
             time.sleep(1)
             continue

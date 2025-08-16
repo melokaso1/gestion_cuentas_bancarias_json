@@ -554,6 +554,7 @@ def pago_creditos(a, b):
     if db[numero_user]['creditos'][credito] == 0:
         print(f'Credito {credito} cancelado en su totalidad')
         del db[numero_user]['creditos'][credito]
+        json.write_json(RUTA, db)
         input('Presione enter para continuar...')
     else:
         print(f'Saldo de credito {credito}: ${db[numero_user]["creditos"][credito]}')
