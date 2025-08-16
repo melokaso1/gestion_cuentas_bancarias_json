@@ -8,9 +8,37 @@ RUTA = 'data/db.json'
 
 # cargar datos 
 db = json.read_json(RUTA)
-print(db)
 
-#funcion para obtener fecha y hora actual
+
+#Funcion desembolso de creditos
+def desembolso_creditos(deposito):
+    db = json.read_json(RUTA)
+    os.system('cls')
+    print("Cuentas disponibles para el desembolso:")
+    for cuenta, saldo in db[numero_user]['cuentas'].items():
+        if 100 <= int(cuenta) <= 299:
+            print(f"Cuenta: {cuenta} - Saldo actual: ${saldo}")
+            
+    a = input('\nIngrese el numero de cuenta: ')
+    
+    if int(a)  >= 100 and int(a) <= 299:
+        if a in db[numero_user]['cuentas'].keys():
+            monto = deposito
+            if monto > 0:
+                db[numero_user]['cuentas'][a] += monto
+                json.write_json(RUTA, db)
+                print(f'Desembolso exitoso de ${monto} a la cuenta {a}')
+                print(f'Nuevo saldo en cuenta {a}: ${db[numero_user]["cuentas"][a]}')
+                input("Presione enter para continuar...")
+                return a
+            else:
+                print("El monto debe ser mayor a 0")
+                input("Presione enter para continuar...")
+        else:
+            print(f'La cuenta de ahorros {a} no esta asociada a {numero_user}')
+            input("Presione enter para continuar...")
+
+#funcion para obtener fecha y hora actuaL
 def obtener_fecha_hora():
     tiempo_actual = time.localtime()
     dia = tiempo_actual.tm_mday
@@ -22,7 +50,7 @@ def obtener_fecha_hora():
     return f"{dia:02d}/{mes:02d}/{año} {hora:02d}:{minuto:02d}:{segundo:02d}"
 
 #funcion para agregar al historial
-def agregar_historial(accion, detalles):
+def agregar_historial(accion, cuenta, monto, origen):
     db = json.read_json(RUTA)
     fecha_hora = obtener_fecha_hora()
     if len(db[numero_user]['historial']) == 0:
@@ -34,7 +62,9 @@ def agregar_historial(accion, detalles):
     db[numero_user]['historial'][siguiente_num] = {
         'fecha': fecha_hora,
         'accion': accion,
-        'detalles': detalles
+        'cuenta': cuenta,
+        'monto': monto,
+        'origen': origen
     }
     json.write_json(RUTA, db)
     
@@ -92,8 +122,7 @@ def registro_user():
     input('oprima enter para continuar')
 
 #filtro de usuarios
-def filtro_user():
-    db = json.read_json(RUTA)    
+def filtro_user():    
     global numero_user
     os.system('cls')            
     numero_user = input('Ingrese el numero de usuario: ')
@@ -188,7 +217,7 @@ def deposito_ahorros():
             if monto > 0:
                 db[numero_user]['cuentas'][a] += monto
                 json.write_json(RUTA, db)
-                agregar_historial("DEPOSITO AHORROS", f"Depósito de ${monto} en cuenta {a}")
+                agregar_historial("DEPOSITO AHORROS", a, monto, 'BANCO')
                 print(f'Deposito exitoso de ${monto}')
                 print(f'Nuevo saldo en cuenta {a}: ${db[numero_user]["cuentas"][a]}')
                 input("Presione enter para continuar...")
@@ -213,7 +242,7 @@ def deposito_corriente():
     
     print("Cuentas corrientes disponibles:")
     for cuenta, saldo in db[numero_user]['cuentas'].items():
-        if 200 <= cuenta <= 299:
+        if 200 <= int(cuenta) <= 299:
             print(f"Cuenta: {cuenta} - Saldo actual: ${saldo}")
     
     a = input('\nIngrese el numero de cuenta: ')
@@ -224,7 +253,7 @@ def deposito_corriente():
             if monto > 0:
                 db[numero_user]['cuentas'][a] += monto
                 json.write_json(RUTA, db)
-                agregar_historial("DEPOSITO CORRIENTE", f"Depósito de ${monto} en cuenta {a}")
+                agregar_historial("DEPOSITO CORRIENTE", a, monto, 'BANCO')
                 print(f'Deposito exitoso de ${monto}')
                 print(f'Nuevo saldo en cuenta {a}: ${db[numero_user]["cuentas"][a]}')
                 input("Presione enter para continuar...")
@@ -263,7 +292,7 @@ def deposito_CDT():
                 
                 db[numero_user]['cuentas'][a] += v_t
                 json.write_json(RUTA, db)
-                agregar_historial("DEPOSITO CDT", f"Depósito de ${v_t} en cuenta {a}")
+                agregar_historial("DEPOSITO CDT", a, v_t, 'BANCO')
                 
                 print(f'''Deposito exitoso 
 Su saldo del CDT estimado a 1 año al 12% anual es: {db[numero_user]['cuentas'][a]}''')
@@ -293,18 +322,20 @@ def credito_libre_inv():
             if len(db[numero_user]['creditos']) == 0:
                 db[numero_user]['creditos'] = {num_acc : cant}
                 json.write_json(RUTA, db)
-                agregar_historial("APROBACION CREDITO", f"Crédito de libre inversión aprobado por ${cant} , número {num_acc}")
                 print(f'El credito fue aprobado, numero de credito: {num_acc}')
                 input('Precione enter para continuar...')
                 time.sleep(1)
+                a = desembolso_creditos(cant)
+                agregar_historial("DESEMBOLSO CREDITO", a, cant, f'Credito: {num_acc}')
                 break
             else:
                 db[numero_user]['creditos'][num_acc] = cant
                 json.write_json(RUTA, db)
-                agregar_historial("APROBACION CREDITO", f"Crédito de libre inversión aprobado por ${cant} , número {num_acc}")
                 print(f'El credito fue aprobado, numero de credito: {num_acc}')
                 input('Precione enter para continuar...')
                 time.sleep(1)
+                a = desembolso_creditos(cant)
+                agregar_historial("DESEMBOLSO CREDITO", a, cant, f'Credito: {num_acc}')
                 break
         else:
             print('No se puede solicitar mas de 5 creditos')
@@ -325,23 +356,28 @@ def credito_vivienda():
             if len(db[numero_user]['creditos']) == 0:
                 db[numero_user]['creditos'] = {num_acc : cant}
                 json.write_json(RUTA, db)
-                agregar_historial("APROBACION CREDITO", f"Crédito de vivienda aprobado por ${cant} , número {num_acc}")
                 print(f'El credito fue aprobado, numero de credito: {num_acc}')
                 input('Precione enter para continuar...')
                 time.sleep(1)
+                a = desembolso_creditos(cant)
+                agregar_historial("DESEMBOLSO CREDITO", a, cant, f'Credito: {num_acc}')
                 break
+            
             else:
                 db[numero_user]['creditos'][num_acc] = cant
                 json.write_json(RUTA, db)
-                agregar_historial("APROBACION CREDITO", f"Crédito de vivienda aprobado por ${cant} , número {num_acc}")
                 print(f'El credito fue aprobado, numero de credito: {num_acc}')
                 input('Precione enter para continuar...')
                 time.sleep(1)
+                a = desembolso_creditos(cant)
+                agregar_historial("DESEMBOLSO CREDITO", a, cant, f'Credito: {num_acc}')
                 break
+            
         else:
             print('No se puede solicitar mas de 5 creditos')
             time.sleep(1)
             break
+
 def credito_vehicular():
     db = json.read_json(RUTA)
     os.system('cls')
@@ -356,18 +392,20 @@ def credito_vehicular():
             if len(db[numero_user]['creditos']) == 0:
                 db[numero_user]['creditos'] = {num_acc : cant}
                 json.write_json(RUTA, db)
-                agregar_historial("APROBACION CREDITO", f"Crédito vehicular aprobado por ${cant} , número {num_acc}")
                 print(f'El credito fue aprobado, numero de credito: {num_acc}')
                 input('Precione enter para continuar...')
                 time.sleep(1)
+                a = desembolso_creditos(cant)
+                agregar_historial("DESEMBOLSO CREDITO", a, cant, f'Credito: {num_acc}')
                 break
             else:
                 db[numero_user]['creditos'][num_acc] = cant
                 json.write_json(RUTA, db)
-                agregar_historial("APROBACION CREDITO", f"Crédito vehicular aprobado por ${cant} , número {num_acc}")
                 print(f'El credito fue aprobado, numero de credito: {num_acc}')
                 input('Precione enter para continuar...')
                 time.sleep(1)
+                a = desembolso_creditos(cant)
+                agregar_historial("DESEMBOLSO CREDITO", a, cant, f'Credito: {num_acc}')
                 break
         else:
             print('No se puede solicitar mas de 5 creditos')
@@ -411,7 +449,7 @@ def retiro_cuenta_ahorro():
         
     db[numero_user]['cuentas'][acc_num] -= monto
     json.write_json(RUTA, db)
-    agregar_historial("RETIRO AHORROS", f"Retiro de ${monto} desde cuenta {acc_num}")
+    agregar_historial("RETIRO AHORROS", numero_user, monto, acc_num)
     print(f'Retiro exitoso de ${monto}')
     print(f'Nuevo saldo en cuenta {acc_num}: ${db[numero_user]["cuentas"][acc_num]}')
     input("Presione enter para continuar...")
@@ -452,7 +490,7 @@ def retiro_cuenta_corriente():
         
     db[numero_user]['cuentas'][acc_num] -= monto
     json.write_json(RUTA, db)
-    agregar_historial("RETIRO CORRIENTE", f"Retiro de ${monto} desde cuenta corriente {acc_num}")
+    agregar_historial("RETIRO AHORROS", numero_user, monto, acc_num)
     print(f'Retiro exitoso de ${monto}')
     print(f'Nuevo saldo en cuenta {acc_num}: ${db[numero_user]["cuentas"][acc_num]}')
     input("Presione enter para continuar...")
@@ -507,7 +545,7 @@ def pago_creditos(a, b):
     json.write_json(RUTA, db)
     db[numero_user]['creditos'][credito] -= monto
     json.write_json(RUTA, db)
-    agregar_historial("PAGO CREDITO", f"Pago de ${monto} al crédito {credito}")
+    agregar_historial("PAGO CREDITO", f"Credito: {credito}", monto, acc_pago)
     print(f'Pago realizado por valor de ${monto}')
     print(f'Saldo en cuenta {acc_pago}: ${db[numero_user]["cuentas"][acc_pago]}')
     
@@ -555,4 +593,41 @@ def cancelar_cuenta(a, b, acc):
 def historial_movimientos():
     db = json.read_json(RUTA)
     os.system('cls')
+    print('''
+         HISTORIAL
+===========================
+
+  CUENTAS DE AHORROS
+=======================''')
+    for cuenta in db[numero_user]['cuentas'].keys():
+        if 100 <= int(cuenta) <= 199: 
+            print(f'Cuenta: {cuenta} | Saldo: ${db[numero_user]["cuentas"][cuenta]}')
+            
+    print('''
+
+  CUENTAS CORRIENTES
+======================''')
+    for cuenta in db[numero_user]['cuentas'].keys():
+        if 200 <= int(cuenta) <= 299: 
+            print(f'Cuenta: {cuenta} | Saldo: ${db[numero_user]["cuentas"][cuenta]}')
+
+    print('''
+
+  CUENTAS CDT'S
+======================''')
+    for cuenta in db[numero_user]['cuentas'].keys():
+        if 300 <= int(cuenta) <= 399: 
+            print(f'Cuenta: {cuenta} | Saldo: ${db[numero_user]["cuentas"][cuenta]}')
     
+    print(f'''
+
+                                                                 HISTORIAL DE MOVIMIENTOS''')
+    
+    for history in db[numero_user]['historial'].keys():
+        print(f'''      
+============================================================================================================================================
+|        Movimiento: {db[numero_user]['historial'][history]['accion']}      |       Origen: {db[numero_user]['historial'][history]['origen']}      |       Cantidad: {db[numero_user]['historial'][history]['monto']}        |       Destino: {db[numero_user]['historial'][history]['cuenta']}     |
+============================================================================================================================================''')
+    
+    input('\nPresione enter para continuar...')
+

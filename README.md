@@ -2,7 +2,7 @@
 
 ## 📋 Descripción General
 
-**Sistema de Gestión Bancaria** es una aplicación de consola desarrollada en Python que permite gestionar operaciones bancarias completas para clientes. El sistema ofrece funcionalidades para registro de clientes, administración de cuentas, solicitud de productos financieros, créditos, y seguimiento de transacciones.
+**Sistema de Gestión Bancaria** es una aplicación de consola desarrollada en Python que permite gestionar operaciones bancarias completas para clientes. El sistema ofrece funcionalidades para registro de clientes, administración de cuentas, solicitud de productos financieros, créditos, y seguimiento de transacciones con almacenamiento persistente en formato JSON.
 
 ## 👨‍💻 Autor
 
@@ -13,17 +13,19 @@
 - **Lenguaje:** Python 3.12.0
 - **Sistema Operativo:** Windows
 - **Tipo:** Aplicación de consola/terminal
+- **Almacenamiento:** Archivos JSON locales
+- **Librerías estándar:** json, os, random, time, typing
 
 ## 📁 Estructura de Archivos
 
 ```
 ├── README.md               # Documentación del proyecto
-├── main.py                # Código principal del sistema
+├── main.py                # Código principal del sistema (menú principal)
 ├── data/
-│   └── database.json      # Base de datos JSON persistente
+│   └── db.json            # Base de datos JSON persistente
 ├── modules/
-│   ├── json_logic.py      # Manejo de operaciones JSON
-│   ├── logicas.py         # Lógica de negocio y operaciones
+│   ├── json_logic.py      # Manejo de operaciones JSON (CRUD)
+│   ├── logicas.py         # Lógica de negocio y operaciones bancarias
 │   └── menu.py            # Interfaces de menú y navegación
 ```
 
@@ -63,10 +65,10 @@
 }
 ```
 
-### Rangos de Números de Cuenta
+### Rangos de Números de Cuenta y Créditos
 - **Cuentas de Ahorros**: 100-199
 - **Cuentas Corrientes**: 200-299
-- **CDTs**: 300-399
+- **CDTs (Certificados de Depósito a Término)**: 300-399
 - **Créditos de Libre Inversión**: 1000-1999
 - **Créditos de Vivienda**: 2000-2999
 - **Créditos Vehiculares**: 3000-3999
@@ -74,46 +76,49 @@
 ## 🎯 Funcionalidades Principales
 
 ### 1. **Registro de Clientes**
-- Registro completo con información personal
-- Generación automática de número de usuario único
-- Almacenamiento de datos de contacto y ubicación
+- Registro completo con información personal y de contacto
+- Generación automática de número de usuario único (0-10000)
+- Almacenamiento de datos de ubicación geográfica
+- Validación de duplicados
 
 ### 2. **Gestión de Cuentas**
-- **Cuentas de Ahorros** (100-199)
-- **Cuentas Corrientes** (200-299)
-- **CDTs (Certificados de Depósito a Término)** (300-399)
+- **Cuentas de Ahorros** (100-199): Sin restricciones especiales
+- **Cuentas Corrientes** (200-299): Sin restricciones especiales
+- **CDTs** (300-399): Inversión con rendimiento del 12% anual
 - Depósitos y retiros por cuenta
-- Cancelación de cuentas
+- Cancelación de cuentas (solo si saldo es 0)
 
 ### 3. **Sistema de Créditos**
 - **Crédito de Libre Inversión** (1000-1999)
 - **Crédito de Vivienda** (2000-2999)
 - **Crédito Vehicular** (3000-3999)
-- Máximo 5 créditos por cliente
-- Sistema de pagos y amortización
+- Límite máximo de 5 créditos por cliente
+- Sistema de pagos parciales o totales
+- Cancelación automática cuando el saldo llega a 0
 
-### 4. **Historial y Reportes**
-- Registro completo de transacciones
-- Historial detallado por usuario
-- Reportes de movimientos
-- Estadísticas de ingresos/gastos
-
-### 5. **Operaciones Disponibles**
+### 4. **Operaciones Disponibles**
 - ✅ Registro de nuevos clientes
-- ✅ Solicitud de productos bancarios
-- ✅ Depósitos a cuentas
-- ✅ Solicitud de créditos
-- ✅ Retiros de cuentas
-- ✅ Pagos a créditos
+- ✅ Solicitud de productos bancarios (cuentas y CDT)
+- ✅ Depósitos a cuentas (ahorros, corriente, CDT)
+- ✅ Solicitud de créditos (3 tipos)
+- ✅ Retiros de cuentas (ahorros y corriente)
+- ✅ Pagos a créditos (parciales o totales)
 - ✅ Cierre de cuentas/productos
-- ✅ Visualización de historial completo
+- ✅ Visualización de historial completo de transacciones
+
+### 5. **Sistema de Auditoría**
+- Registro automático de todas las transacciones
+- Timestamp preciso para cada operación
+- Detalles completos de cada movimiento
+- Historial por usuario
 
 ## 🎮 Cómo Usar el Sistema
 
-### Instalación
-1. Asegúrese de tener Python 3.12.0 instalado
-2. Descargue todos los archivos del proyecto
+### Instalación y Ejecución
+1. Asegúrese de tener Python 3.12.0 o superior instalado
+2. Descargue todos los archivos del proyecto manteniendo la estructura de carpetas
 3. Ejecute desde la terminal: `python main.py`
+4. El sistema creará automáticamente el archivo `data/db.json` si no existe
 
 ### Navegación del Menú Principal
 ```
@@ -128,41 +133,90 @@
 9. Salir
 ```
 
-### Ejemplo de Flujo de Uso
-1. **Registro**: Ingrese sus datos personales para crear un usuario
+### Flujo de Uso Recomendado
+1. **Primer Uso**: Registre un nuevo cliente con todos sus datos
 2. **Solicitud de Productos**: Abra cuentas de ahorro/corriente o solicite CDT
-3. **Operaciones**: Realice depósitos, retiros, solicite créditos
-4. **Seguimiento**: Consulte su historial completo de transacciones
+3. **Operaciones**: Realice depósitos, retiros, solicite créditos según necesite
+4. **Seguimiento**: Consulte regularmente su historial de transacciones
+5. **Gestión**: Realice pagos de créditos o cierre cuentas según corresponda
 
 ## 🔧 Características Técnicas
 
-### Estructura de Datos
-- **Diccionario principal (`db`)**: Almacena todos los usuarios y sus datos
-- **Organización por número de usuario único**
-- **Sistema de historial con timestamps**
-- **Validación de rangos para tipos de cuentas/créditos**
+### Módulos del Sistema
+
+#### **main.py**
+- Punto de entrada principal
+- Control de flujo mediante estructura match-case
+- Manejo de errores con try-except
+- Limpieza de pantalla entre operaciones
+
+#### **modules/logicas.py**
+- **Funciones principales**:
+  - `registro_user()`: Registro completo de nuevos clientes
+  - `filtro_user()`: Validación de usuarios existentes
+  - Operaciones de cuenta: depósitos, retiros, cancelaciones
+  - Operaciones de crédito: solicitud, pagos, cancelaciones
+  - `historial_movimientos()`: Visualización de transacciones
+  - `agregar_historial()`: Registro automático de auditoría
+
+#### **modules/menu.py**
+- Interfaces de usuario para cada sección
+- Menús anidados para operaciones específicas
+- Validación de entrada de datos
+
+#### **modules/json_logic.py**
+- **Funciones de persistencia**:
+  - `read_json()`: Lectura de datos desde archivo
+  - `write_json()`: Escritura de datos al archivo
+  - `rewrite_json()`: Actualización parcial de datos
+  - `delete_data_json()`: Eliminación de registros
+  - `initialize_json()`: Inicialización de estructura
 
 ### Validaciones Implementadas
-- Verificación de rangos de números de cuenta
+- Verificación de rangos de números de cuenta/crédito
 - Límite de 5 créditos por cliente
 - Validación de saldos antes de retiros/pagos
-- Control de errores en entrada de datos
+- Verificación de existencia de cuentas/créditos
+- Control de entrada de datos numéricos
+- Prevención de duplicados en números de usuario
 
-### Seguridad
+### Seguridad y Auditoría
 - Números de cuenta/crédito generados automáticamente
-- Validación de existencia antes de operaciones
-- Registro completo de auditoría
+- Validación de existencia antes de cada operación
+- Registro completo de auditoría con timestamps
+- Prevención de cancelación de cuentas con saldo
+- Validación de rangos para tipos específicos de productos
 
 ## 🚀 Requisitos del Sistema
 
 - **Python:** 3.12.0 o superior
 - **Sistema Operativo:** Windows (compatible con versiones recientes)
-- **Espacio en Disco:** Mínimo 10MB
-- **RAM:** 512MB mínimo
+- **Espacio en Disco:** Mínimo 1MB para datos
+- **RAM:** 128MB mínimo
+- **Permisos:** Lectura/escritura en directorio del proyecto
 
 ## 📝 Notas Importantes
 
-- El sistema almacena datos en memoria (se pierden al cerrar el programa)
-- Los números de cuenta y crédito se generan automáticamente
-- Se recomienda respaldar información importante externamente
-- El sistema es para propósitos educativos/demostrativos
+- **Persistencia de Datos**: Todos los datos se almacenan localmente en `data/db.json`
+- **Generación Automática**: Los números de cuenta y crédito se generan automáticamente según rangos predefinidos
+- **CDTs**: Los Certificados de Depósito a Término generan rendimiento del 12% anual automáticamente
+- **Límites**: Máximo 5 créditos por cliente
+- **Cancelaciones**: Solo se pueden cancelar cuentas con saldo 0
+- **Historial**: Todas las operaciones quedan registradas automáticamente
+- **Uso Educativo**: Sistema diseñado para propósitos educativos y demostrativos
+
+## 📊 Ejemplo de Uso
+
+```bash
+# Ejecutar el sistema
+python main.py
+
+# Flujo típico:
+# 1. Registro de cliente → Obtiene número de usuario
+# 2. Solicitud de productos → Crea cuenta de ahorros
+# 3. Depósito a cuentas → Agrega saldo a la cuenta
+# 4. Solicitud de créditos → Solicita crédito de libre inversión
+# 5. Pagos a créditos → Realiza pagos desde cuenta
+# 6. Historial → Revisa todas las operaciones realizadas
+
+```

@@ -1,10 +1,35 @@
 {
     "7086": {
         "cuentas": {
+            "161": 85000000,
+            "253": 20000000
         },
         "creditos": {
+            "2114": 80000000,
+            "3324": 20000000
         },
         "historial": {
+            "1": {
+                "fecha": "15/08/2025 21:28:40",
+                "accion": "DESEMBOLSO CREDITO",
+                "cuenta": "161",
+                "monto": 80000000,
+                "origen": "Credito: 2114"
+            },
+            "2": {
+                "fecha": "15/08/2025 21:28:54",
+                "accion": "DESEMBOLSO CREDITO",
+                "cuenta": "253",
+                "monto": 20000000,
+                "origen": "Credito: 3324"
+            },
+            "3": {
+                "fecha": "15/08/2025 21:36:12",
+                "accion": "DEPOSITO AHORROS",
+                "cuenta": "161",
+                "monto": 5000000,
+                "origen": "BANCO"
+            }
         }
     }
 }

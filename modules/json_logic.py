@@ -2,9 +2,8 @@ import os
 import json
 from typing import Optional
 
-dict_prueba = {1 : 2}
+
 RUTA = 'data/db.json'
-s = 'a'
 
 def read_json(file_path : str):
     try:
