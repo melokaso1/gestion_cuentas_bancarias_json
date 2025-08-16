@@ -218,5 +218,3 @@ python main.py
 # 4. Solicitud de créditos → Solicita crédito de libre inversión
 # 5. Pagos a créditos → Realiza pagos desde cuenta
 # 6. Historial → Revisa todas las operaciones realizadas
-
-```

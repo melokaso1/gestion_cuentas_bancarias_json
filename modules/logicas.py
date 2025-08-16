@@ -117,9 +117,10 @@ def registro_user():
             }
         
     json.rewrite_json(RUTA, db)
-        
+    
+    os.system('cls')
     print(f'Usuario creado con exito, su numero de usuario es: {acc_num}')
-    input('oprima enter para continuar')
+    input('oprima enter para continuar...')
 
 #filtro de usuarios
 def filtro_user():    
@@ -198,7 +199,6 @@ Su saldo del CDT estimado a 1 año al 12% anual es: {v_t}''')
 def deposito_ahorros():
     db = json.read_json(RUTA)
     os.system('cls')
-    print(len(db[numero_user]['cuentas']))
     if len(db[numero_user]['cuentas']) == 0:
         print("No tiene cuentas registradas")
         input("Presione enter para continuar...")
@@ -218,6 +218,7 @@ def deposito_ahorros():
                 db[numero_user]['cuentas'][a] += monto
                 json.write_json(RUTA, db)
                 agregar_historial("DEPOSITO AHORROS", a, monto, 'BANCO')
+                os.system('cls')
                 print(f'Deposito exitoso de ${monto}')
                 print(f'Nuevo saldo en cuenta {a}: ${db[numero_user]["cuentas"][a]}')
                 input("Presione enter para continuar...")
@@ -254,6 +255,7 @@ def deposito_corriente():
                 db[numero_user]['cuentas'][a] += monto
                 json.write_json(RUTA, db)
                 agregar_historial("DEPOSITO CORRIENTE", a, monto, 'BANCO')
+                os.system('cls')
                 print(f'Deposito exitoso de ${monto}')
                 print(f'Nuevo saldo en cuenta {a}: ${db[numero_user]["cuentas"][a]}')
                 input("Presione enter para continuar...")
@@ -293,7 +295,7 @@ def deposito_CDT():
                 db[numero_user]['cuentas'][a] += v_t
                 json.write_json(RUTA, db)
                 agregar_historial("DEPOSITO CDT", a, v_t, 'BANCO')
-                
+                os.system('cls')
                 print(f'''Deposito exitoso 
 Su saldo del CDT estimado a 1 año al 12% anual es: {db[numero_user]['cuentas'][a]}''')
                 input("Presione enter para continuar...")
@@ -509,7 +511,7 @@ def pago_creditos(a, b):
         if a <= int(credito) <= b:
             print(f"Credito: {credito} - Saldo: ${saldo}")
     
-    credito = int(input('\n Ingrese el numero de credito a pagar: '))
+    credito = input('\n Ingrese el numero de credito a pagar: ')
     
     os.system('cls')
     
@@ -567,7 +569,15 @@ def cancelar_cuenta(a, b, acc):
         input("Presione enter para continuar...")
         return
     
-    acc_canc = input(f'Ingrese su numero de cuenta para cancelar ({acc}): ')
+    cont = 0
+    
+    print('Cuentas Disponibles:\n')
+    for cuenta in db[numero_user]['cuentas'].keys():
+        if a <= int(cuenta) <= b:
+            cont += 1
+            print(f'#{cont} | {acc}: {cuenta}')
+    
+    acc_canc = input(f'\nIngrese su numero de cuenta para cancelar ({acc}): ')
     
     if acc_canc not in db[numero_user]['cuentas'].keys():
         print(f'El número de cuenta {acc_canc} no es válido')
